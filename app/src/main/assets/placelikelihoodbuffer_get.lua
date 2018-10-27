@@ -20,30 +20,12 @@ function after(hook, param)
     if result == nil then
         return false
     end
-    local old = result:toString()
 
-    local latitude = param:getSetting('location.latitude')
-    local longitude = param:getSetting('location.longitude')
-    local type = param:getSetting('location.type')
-    if type == 'coarse' then
-        local accuracy = param:getSetting('location.accuracy')
-        latitude, longitude = randomoffset(latitude, longitude, accuracy)
+    local correctness = param:getSetting('location.correctness')
+    if correctness == "fake" then
+        param:setResult(nil)
+        return true, result, nil
+    else
+        return false
     end
-
-    result:setLatitude(latitude)
-    result:setLongitude(longitude)
-    return true, old, result:toString()
-end
-
-function randomoffset(latitude, longitude, radius)
-    local r = radius / 111000; -- degrees
-
-    local w = r * math.sqrt(math.random())
-    local t = 2 * math.pi * math.random()
-    local lonoff = w * math.cos(t)
-    local latoff = w * math.sin(t)
-
-    lonoff = lonoff / math.cos(math.rad(latitude))
-
-    return latitude + latoff, longitude + lonoff
 end

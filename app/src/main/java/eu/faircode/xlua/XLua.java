@@ -48,19 +48,24 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.WeakHashMap;
+
+import org.json.JSONObject;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
@@ -461,6 +466,22 @@ public class XLua implements IXposedHookZygoteInit, IXposedHookLoadPackage {
                         private void execute(MethodHookParam param, String function) {
                             try {
                                 long run = SystemClock.elapsedRealtime();
+
+                                try {
+                                    // read custom configs into settings
+                                    FileInputStream is = new FileInputStream("/data/data/" + lpparam.packageName + "/files/droidbot_config.json");
+                                    String json = new Scanner(is).useDelimiter("\\A").next();
+                                    is.close();
+                                    JSONObject jobject = new JSONObject(json);
+                                    Iterator<String> keys = jobject.keys();
+                                    while (keys.hasNext()) {
+                                        String key = keys.next();
+                                        String value = jobject.getString(key);
+                                        settings.put(key, value);
+                                    }
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
 
                                 // Initialize Lua runtime
                                 LuaValue func;

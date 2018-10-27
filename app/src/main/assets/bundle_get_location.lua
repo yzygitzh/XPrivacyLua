@@ -26,9 +26,30 @@ function after(hook, param)
         return false
     end
 
+    local latitude = param:getSetting('location.latitude')
+    local longitude = param:getSetting('location.longitude')
+    local type = param:getSetting('location.type')
+    if type == 'coarse' then
+        local accuracy = param:getSetting('location.accuracy')
+        latitude, longitude = randomoffset(latitude, longitude, accuracy)
+    end
+
     local fake = luajava.newInstance('android.location.Location', 'privacy')
-    fake:setLatitude(0)
-    fake:setLongitude(0)
+    fake:setLatitude(latitude)
+    fake:setLongitude(longitude)
     param:setResult(fake)
     return true, result:toString(), fake:toString()
+end
+
+function randomoffset(latitude, longitude, radius)
+    local r = radius / 111000; -- degrees
+
+    local w = r * math.sqrt(math.random())
+    local t = 2 * math.pi * math.random()
+    local lonoff = w * math.cos(t)
+    local latoff = w * math.sin(t)
+
+    lonoff = lonoff / math.cos(math.rad(latitude))
+
+    return latitude + latoff, longitude + lonoff
 end

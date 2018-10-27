@@ -16,13 +16,11 @@
 -- Copyright 2017-2018 Marcel Bokhorst (M66B)
 
 function before(hook, param)
-    local correctness = param:getSetting('location.correctness')
-    if correctness == "fake" then
-        param:setArgument(0, 0) -- latitude
-        param:setArgument(1, 0) -- longitude
-        param:setArgument(2, 0.1) -- radius
-        return true
-    else
+    local type = param:getSetting('location.type')
+    if type == 'fine' then
         return false
+    else
+        param:setResult(nil)
+        return true
     end
 end

@@ -15,13 +15,16 @@
 
 -- Copyright 2017-2018 Marcel Bokhorst (M66B)
 
-function before(hook, param)
+function after(hook, param)
+    local result = param:getResult()
+    if result == 0 then
+        return false
+    end
+
     local correctness = param:getSetting('location.correctness')
     if correctness == "fake" then
-        param:setArgument(0, 0) -- latitude
-        param:setArgument(1, 0) -- longitude
-        param:setArgument(2, 0.1) -- radius
-        return true
+        param:setResult(0)
+        return true, result, 0
     else
         return false
     end

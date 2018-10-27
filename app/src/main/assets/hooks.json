@@ -547,7 +547,7 @@
     ],
     "returnType": "boolean",
     "minSdk": 5,
-    "luaScript": "@generic_false_value"
+    "luaScript": "@locationmanager_addnmealistener"
   },
   {
     "collection": "Privacy",
@@ -561,7 +561,7 @@
     ],
     "returnType": "boolean",
     "minSdk": 24,
-    "luaScript": "@generic_false_value"
+    "luaScript": "@locationmanager_addnmealistener"
   },
   {
     "collection": "Privacy",
@@ -576,7 +576,7 @@
     ],
     "returnType": "boolean",
     "minSdk": 24,
-    "luaScript": "@generic_false_value"
+    "luaScript": "@locationmanager_addnmealistener"
   },
   {
     "collection": "Privacy",
@@ -594,7 +594,7 @@
     ],
     "returnType": "void",
     "minSdk": 1,
-    "luaScript": "@generic_block_method"
+    "luaScript": "@locationmanager_addproximityalert"
   },
   {
     "collection": "Privacy",
@@ -625,7 +625,7 @@
     "returnType": "int",
     "minSdk": 1,
     "optional": true,
-    "luaScript": "@generic_zero_value"
+    "luaScript": "@placelikelihoodbuffer_getcount"
   },
   {
     "collection": "Privacy",
