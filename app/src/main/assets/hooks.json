@@ -640,7 +640,7 @@
     // any return type
     "minSdk": 1,
     "optional": true,
-    "luaScript": "@generic_null_value"
+    "luaScript": "@placelikelihoodbuffer_get"
   },
   // Get messages
   // https://developer.android.com/reference/android/provider/Telephony.Sms.Intents#SMS_RECEIVED_ACTION

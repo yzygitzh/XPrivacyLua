@@ -48,24 +48,19 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.WeakHashMap;
-
-import org.json.JSONObject;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
@@ -272,7 +267,7 @@ public class XLua implements IXposedHookZygoteInit, IXposedHookLoadPackage {
         });
     }
 
-    private void hookPackage(final XC_LoadPackage.LoadPackageParam lpparam, int uid, final Context context) throws Throwable {
+    private void hookPackage(final XC_LoadPackage.LoadPackageParam lpparam, final int uid, final Context context) throws Throwable {
         // Get assigned hooks
         List<XHook> hooks = new ArrayList<>();
         Cursor chooks = null;
@@ -467,20 +462,32 @@ public class XLua implements IXposedHookZygoteInit, IXposedHookLoadPackage {
                             try {
                                 long run = SystemClock.elapsedRealtime();
 
+                                // Update global settings
+                                Cursor csettings3 = null;
                                 try {
-                                    // read custom configs into settings
-                                    FileInputStream is = new FileInputStream("/data/data/" + lpparam.packageName + "/files/droidbot_config.json");
-                                    String json = new Scanner(is).useDelimiter("\\A").next();
-                                    is.close();
-                                    JSONObject jobject = new JSONObject(json);
-                                    Iterator<String> keys = jobject.keys();
-                                    while (keys.hasNext()) {
-                                        String key = keys.next();
-                                        String value = jobject.getString(key);
-                                        settings.put(key, value);
-                                    }
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
+                                    csettings3 = context.getContentResolver()
+                                            .query(XProvider.getURI(), new String[]{"xlua.getSettings"},
+                                                    null, new String[]{"global", Integer.toString(uid)},
+                                                    null);
+                                    while (csettings3 != null && csettings3.moveToNext())
+                                        settings.put(csettings3.getString(0), csettings3.getString(1));
+                                } finally {
+                                    if (csettings3 != null)
+                                        csettings3.close();
+                                }
+
+                                // Update app settings
+                                Cursor csettings4 = null;
+                                try {
+                                    csettings4 = context.getContentResolver()
+                                            .query(XProvider.getURI(), new String[]{"xlua.getSettings"},
+                                                    null, new String[]{lpparam.packageName, Integer.toString(uid)},
+                                                    null);
+                                    while (csettings4 != null && csettings4.moveToNext())
+                                        settings.put(csettings4.getString(0), csettings4.getString(1));
+                                } finally {
+                                    if (csettings4 != null)
+                                        csettings4.close();
                                 }
 
                                 // Initialize Lua runtime
